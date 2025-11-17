@@ -1,7 +1,7 @@
 // API Configuration
 const API_CONFIG = {
-    baseURL: 'https://YOUR-REPLIT-URL.replit.app',
-    secret: 'YOUR_API_SECRET_TOKEN'
+    baseURL: 'https://replit.com/@mick890891/DiscordBotStore',
+    secret: 'KYRAzero77'
 };
 
 // Create order
@@ -127,3 +127,4 @@ function initCheckout() {
 document.addEventListener('DOMContentLoaded', () => {
     initCheckout();
 });
+
