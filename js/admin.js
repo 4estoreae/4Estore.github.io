@@ -1,8 +1,8 @@
 ```javascript
 // Admin Configuration
 const ADMIN_PASSWORD = 'KYRAzero77';
-const GITHUB_TOKEN = 'YOUR_GITHUB_TOKEN_HERE';
-const GITHUB_REPO = 'username/repo-name';
+const GITHUB_TOKEN = 'KYRAzero77';
+const GITHUB_REPO = 'mick890891/DiscordBotStore';
 const PRODUCTS_FILE = 'data/products.json';
 
 let products = [];
@@ -166,3 +166,4 @@ async function saveProductsToGitHub() {
 ```
 
 ---
+
