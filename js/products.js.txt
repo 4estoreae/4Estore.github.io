@@ -1,0 +1,164 @@
+```javascript
+// Load and display products
+async function loadProducts() {
+    try {
+        const response = await fetch('data/products.json');
+        const products = await response.json();
+        displayProducts(products);
+    } catch (error) {
+        console.error('Error loading products:', error);
+        document.getElementById('productsGrid').innerHTML = `
+            
+                Failed to load products. Please try again later.
+            
+        `;
+    }
+}
+
+// Display products in grid
+function displayProducts(products) {
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
+
+    grid.innerHTML = products.map(product => `
+        
+            
+            
+                ${product.name}
+                ${product.description}
+                
+                    ${product.price.toFixed(2)}
+                    
+                        Add to Cart
+                    
+                
+            
+        
+    `).join('');
+}
+
+// Initialize products page
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('productsGrid')) {
+        loadProducts();
+    }
+});
+```
+
+---
+
+## 📄 js/api.js
+```javascript
+// API Configuration
+const API_CONFIG = {
+    baseURL: 'https://YOUR-REPLIT-URL.replit.app',
+    secret: 'YOUR_API_SECRET_TOKEN'
+};
+
+// Create order
+async function createOrder(username, cart, total) {
+    try {
+        // Convert cart items to the required format
+        const items = cart.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: Math.round(item.price * 100) // Convert dollars to cents
+        }));
+
+        const totalPrice = Math.round(total * 100); // Convert total to cents
+
+        const response = await fetch(`${API_CONFIG.baseURL}/api/createOrder`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-Secret': API_CONFIG.secret
+            },
+            body: JSON.stringify({
+                discordUsername: username,
+                items: items,
+                totalPrice: totalPrice
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Order creation failed');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
+}
+
+// Checkout handler
+function initCheckout() {
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const checkoutModal = document.getElementById('checkoutModal');
+    const confirmOrder = document.getElementById('confirmOrder');
+    const cancelCheckout = document.getElementById('cancelCheckout');
+    const checkoutTotal = document.getElementById('checkoutTotal');
+
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            checkoutModal.classList.add('open');
+            if (checkoutTotal) {
+                checkoutTotal.textContent = getCartTotal().toFixed(2);
+            }
+        });
+    }
+
+    if (cancelCheckout) {
+        cancelCheckout.addEventListener('click', () => {
+            checkoutModal.classList.remove('open');
+        });
+    }
+
+    if (confirmOrder) {
+        confirmOrder.addEventListener('click', async () => {
+            const username = document.getElementById('discordUsername').value.trim();
+            const confirmed = document.getElementById('confirmJoin').checked;
+
+            if (!username) {
+                alert('Please enter your Discord username!');
+                return;
+            }
+
+            if (!confirmed) {
+                alert('Please confirm you have joined our Discord server!');
+                return;
+            }
+
+            confirmOrder.disabled = true;
+            confirmOrder.textContent = 'Processing...';
+
+            try {
+                await createOrder(username, cart, getCartTotal());
+                alert('Order placed successfully! Check your Discord DMs for delivery.');
+                cart = [];
+                saveCart();
+                checkoutModal.classList.remove('open');
+                document.getElementById('cartSidebar').classList.remove('open');
+                document.getElementById('discordUsername').value = '';
+                document.getElementById('confirmJoin').checked = false;
+            } catch (error) {
+                alert('Order failed. Please contact support on Discord.');
+            } finally {
+                confirmOrder.disabled = false;
+                confirmOrder.textContent = 'Confirm Order';
+            }
+        });
+    }
+}
+
+// Initialize checkout on page load
+document.addEventListener('DOMContentLoaded', () => {
+    initCheckout();
+});
+```
+
+---
